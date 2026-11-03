@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions globales
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Profil utilisateur : Seul le propriétaire peut lire et modifier son document
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId) && isValidId(userId);
+      allow update: if isOwner(userId);
+      allow delete: if false; // Suppression manuelle désactivée
+
+      // Cartes de révision SM-2 privées
+      match /sm2_cards/{cardId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Banque de questions : Lecture publique pour tout utilisateur connecté, écriture interdite au client
+    match /questions/{questionId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Géré par fonction serveur / administrateur
+    }
+
+    // Signalements d'erreurs : Tout utilisateur connecté peut créer un signalement
+    match /reports/{reportId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if false; // Accessible uniquement aux modérateurs via console
+    }
+
+    // Classements et ligues dénormalisés
+    match /leaderboards/{leagueId}/members/{memberId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(memberId);
+    }
+  }
+}

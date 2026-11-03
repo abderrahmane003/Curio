@@ -1,0 +1,6 @@
+{
+  "name": "Érudit — Culture & Savoir",
+  "description": "Application mobile-first de culture générale épurée, stimulante et addictive. Apprenez chaque jour avec plaisir grâce aux 12 domaines, quiz interactifs et révision espacée.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

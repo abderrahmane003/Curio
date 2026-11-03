@@ -1,0 +1,82 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Profil utilisateur avec XP, niveau, streak et progression par domaine",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string", "maxLength": 80 },
+        "title": { "type": "string", "maxLength": 60 },
+        "avatar": { "type": "string", "maxLength": 10 },
+        "xp": { "type": "number" },
+        "level": { "type": "number" },
+        "streakDays": { "type": "number" },
+        "lastPlayedDate": { "type": "string" },
+        "starterLevel": { "type": "string", "enum": ["curieux", "erudit", "encyclopediste"] },
+        "dailyGoalMinutes": { "type": "number" }
+      },
+      "required": ["uid", "xp", "level", "streakDays"]
+    },
+    "SM2Card": {
+      "title": "SM2Card",
+      "description": "Carte de mémorisation espacée SuperMemo SM-2",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string" },
+        "domainId": { "type": "string" },
+        "repetitions": { "type": "number" },
+        "interval": { "type": "number" },
+        "easeFactor": { "type": "number" },
+        "nextReviewDate": { "type": "string" }
+      },
+      "required": ["questionId", "repetitions", "interval", "easeFactor", "nextReviewDate"]
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Question de culture générale vérifiée et sourcée",
+      "type": "object",
+      "properties": {
+        "domainId": { "type": "string" },
+        "questionText": { "type": "string" },
+        "options": { "type": "array" },
+        "correctIndex": { "type": "number" },
+        "explanation": { "type": "string" },
+        "source": { "type": "string" }
+      },
+      "required": ["domainId", "questionText", "options", "correctIndex", "explanation", "source"]
+    },
+    "QuestionReport": {
+      "title": "QuestionReport",
+      "description": "Signalement d'erreur ou d'imprécision sur une question",
+      "type": "object",
+      "properties": {
+        "questionId": { "type": "string" },
+        "questionText": { "type": "string" },
+        "reason": { "type": "string" },
+        "comment": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "userId": { "type": "string" }
+      },
+      "required": ["questionId", "reason", "timestamp", "userId"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Données personnelles et progression de chaque utilisateur"
+    },
+    "/users/{userId}/sm2_cards/{cardId}": {
+      "schema": { "$ref": "#/entities/SM2Card" },
+      "description": "Cartes de révision espacée SM-2 du joueur"
+    },
+    "/questions/{questionId}": {
+      "schema": { "$ref": "#/entities/Question" },
+      "description": "Banque de questions certifiées"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/QuestionReport" },
+      "description": "Signalements d'erreurs soumis par les utilisateurs"
+    }
+  }
+}
